@@ -45,6 +45,20 @@ a {
   text-decoration: none; 
 }
 
+
+.fade-enter,
+.fade-exit-done {
+  opacity: 0;
+  transform: scale(0.9);
+}
+
+.fade-enter-active,
+.fade-exit {
+  opacity: 1;
+  transform: scale(1);
+  transition: opacity 300ms, transform 300ms;
+}
+
 a:hover {
   text-decoration: underline;
 }

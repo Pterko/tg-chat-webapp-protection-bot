@@ -2,35 +2,25 @@ import Fastify from 'fastify'
 import { verificationSuccessQueue } from './queues';
 import UserModel from './models/user';
 import ChatModel from './models/chat';
+import validateDataFromMiniApp from './utils/validateInitData';
 
 const fastify = Fastify({
   logger: true
 })
 
-// Declare a route
-fastify.get('/api/', (request, reply) => {
-  reply.send({ hello: 'world' })
-})
 
-fastify.post<{ Params: {userObjId: string} }>('/api/verifications/:userObjId/verify', async (request, reply) => {
-  const userObj = await UserModel.findById(request.params.userObjId);
-  if (!userObj){
-    return reply.send({success: false, error: 'USERNOTFOUND'});
+fastify.post<{Params: { userObjId: string}, Body:{ initData: string }}>('/api/verifications/:userObjId/getChat', async (request, reply) => {
+  const validationResult = validateDataFromMiniApp(request.body.initData);
+  if (!validationResult.isValid){
+    return reply.send({success: false, error: 'MAILFORMED_HASH'});
   }
 
-  userObj.verified = true;
-  userObj.save();
-  reply.send({
-    success: true,
-    data: userObj
-  })
-
-});
-
-fastify.get<{Params: { userObjId: string }}>('/api/verifications/:userObjId/getChat', async (request, reply) => {
   const userObj = await UserModel.findById(request.params.userObjId);
   if (!userObj) {
     return reply.send({ success: false, error: 'USERNOTFOUND' });
+  }
+  if (validationResult.data.user.id !== userObj.userId){
+    return reply.send({ success: false, error: 'INVALID_USER' });
   }
 
   const chatObj = await ChatModel.findOne({chatId: userObj.chatId});
@@ -43,7 +33,22 @@ fastify.get<{Params: { userObjId: string }}>('/api/verifications/:userObjId/getC
 
 
 
-fastify.post<{ Params: { userObjId: string }, Body: { recaptchaToken: string } }>('/api/verifications/:userObjId/challenge', async (request, reply) => {
+fastify.post<{ Params: { userObjId: string }, Body: { recaptchaToken: string, initData: string } }>('/api/verifications/:userObjId/challenge', async (request, reply) => {
+  const validationResult = validateDataFromMiniApp(request.body.initData);
+  if (!validationResult.isValid){
+    return reply.send({success: false, error: 'MAILFORMED_HASH'});
+  }
+
+
+  const userObj = await UserModel.findById(request.params.userObjId);
+  if (!userObj) {
+    return reply.send({ success: false, error: 'USERNOTFOUND' });
+  }
+
+  if (validationResult.data.user.id !== userObj.userId){
+    return reply.send({ success: false, error: 'INVALID_USER' });
+  }
+
   const { recaptchaToken } = request.body;
   
   const verificationURL = `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.RECAPTCHA_SECRET}&response=${recaptchaToken}`;
@@ -59,10 +64,7 @@ fastify.post<{ Params: { userObjId: string }, Body: { recaptchaToken: string } }
     return reply.send({ success: false, error: 'RECAPTCHA_VALIDATION_FAILED' });
   }
 
-  const userObj = await UserModel.findById(request.params.userObjId);
-  if (!userObj) {
-    return reply.send({ success: false, error: 'USERNOTFOUND' });
-  }
+
   
   if (!userObj.verified){
     userObj.verified = true;

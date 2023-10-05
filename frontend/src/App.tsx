@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react'
 import './index.css'
 import Reaptcha from 'reaptcha';
+import { CSSTransition } from 'react-transition-group';
+
 
 const CheckIcon = () => (
   <svg className="w-full h-full text-green-500 mx-auto" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -9,36 +11,32 @@ const CheckIcon = () => (
 );
 
 const SuccessPage = () => (
-  <div className="flex items-center justify-center">
-    <div className="p-8 w-full text-center">
-      <div className="w-16 h-16 mx-auto mb-4 relative">
-        <CheckIcon />
-        <div className="absolute inset-0 bg-green-200 opacity-10 rounded-full"></div>
-      </div>
-      <h2 className="text-2xl font-bold mb-2">Success!</h2>
-      <p className="">You're successfully completed verification process. You can close this window.</p>
+  <div className="p-8 w-full text-center">
+    <div className="w-16 h-16 mx-auto mb-4 relative">
+      <CheckIcon />
+      <div className="absolute inset-0 bg-green-200 opacity-10 rounded-full"></div>
     </div>
+    <h2 className="text-2xl font-bold mb-2">Success!</h2>
+    <p className="">You're successfully completed verification process. You can close this window.</p>
   </div>
 );
 
 const ChatRules = ({ chatData }) => (
-  <div className="flex items-center justify-center">
-    <div className="p-8 w-full mx-4">
-      <div className="text-center mb-6">
-        <span className="text-xl font-bold mb-2">Welcome to the chat</span>
-        <div className="text-4xl mt-2 mb-4">{chatData.chatTitle}</div>
-      </div>
-      {chatData.rules ? (
-        <div className="text-center">
-          <span className="mb-4 text-lg">Please, accept these rules before entering the chat:</span>
-          <ul className="mt-4 list-decimal list-inside">
-            {chatData.rules.map((x, index) => (
-              <li key={index} className="mt-2 text-lg">{x}</li>
-            ))}
-          </ul>
-        </div>
-      ) : null}
+  <div className="p-8 w-full mx-4">
+    <div className="text-center mb-6">
+      <span className="text-xl font-bold mb-2">Welcome to the chat</span>
+      <div className="text-4xl mt-2 mb-4">{chatData.chatTitle}</div>
     </div>
+    {chatData.rules ? (
+      <div className="text-center">
+        <span className="mb-4 text-lg">Please, accept these rules before entering the chat:</span>
+        <ul className="mt-4 list-decimal list-inside">
+          {chatData.rules.map((x, index) => (
+            <li key={index} className="mt-2 text-lg">{x}</li>
+          ))}
+        </ul>
+      </div>
+    ) : null}
   </div>
 );
 
@@ -50,7 +48,6 @@ function App() {
   const params = new URLSearchParams(window.Telegram.WebApp.initData);
   const startParam = params.get('start_param');
 
-
   useEffect(() => {
     const mainButtonHandler = () => {
       console.log('ONCLICK RECEIVED')
@@ -61,7 +58,7 @@ function App() {
 
     window.Telegram.WebApp.expand();
     window.Telegram.WebApp.MainButton.text = "Enter Chat";
-  
+
     window.Telegram.WebApp.MainButton
     window.Telegram.WebApp.MainButton.onClick(mainButtonHandler);
     console.log('Set onclick handler !!!!!!!!!!!!!!!!')
@@ -85,13 +82,20 @@ function App() {
 
     async function loadData() {
       try {
-        const response = await fetch(`/api/verifications/${startParam}/getChat`, { method: 'GET' });
+        const response = await fetch(`/api/verifications/${startParam}/getChat`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ initData: window.Telegram.WebApp.initData })
+        });
         const data = await response.json();
 
         if (data.success) {
           setChatData(data.data);
         } else {
-          setFatalError("Error while getting chat data");
+          if (data.error === "INVALID_USER") {
+            return setFatalError("Sorry, this verification request is meant to be verified by another user. Please close this window.")
+          }
+          setFatalError(`Error while getting chat data: ${data.error}`);
         }
       } catch (error) {
         setFatalError("Error while fetching data");
@@ -135,15 +139,29 @@ function App() {
   }
 
   return (
-    <div>
-      {fatalError || (!isShowSuccess && chatData && <ChatRules chatData={chatData} />)}
+    <div className="flex items-center justify-center">
+      <CSSTransition
+        in={!fatalError && !isShowSuccess && chatData}
+        timeout={500}
+        classNames="fade"
+        unmountOnExit
+      >
+        {state => (fatalError || (!isShowSuccess && chatData) ? <ChatRules chatData={chatData} /> : null)}
+      </CSSTransition>
       <Reaptcha
         ref={captchaRef}
         sitekey={import.meta.env.VITE_RECAPTCHA_PUBLIC}
         size="invisible"
         onVerify={onVerify}
       />
-      {isShowSuccess && <SuccessPage />}
+      <CSSTransition
+        in={isShowSuccess}
+        timeout={500}
+        classNames="fade"
+        unmountOnExit
+      >
+        {state => (isShowSuccess ? <SuccessPage /> : null)}
+      </CSSTransition>
     </div>
   )
 }
