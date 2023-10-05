@@ -1,10 +1,19 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+#root {
+  width: 100%;
+}
+
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
   color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
+  /* color: rgba(255, 255, 255, 0.87); */
+  color: var(--tg-theme-text-color);
   background-color: #242424;
 
   font-synthesis: none;
@@ -13,6 +22,53 @@
   -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
 }
+
+
+body {
+  font-family: 'Arial', sans-serif; 
+  background-color: var(--block-bg-color);
+  color: var(--tg-theme-text-color);
+  color-scheme: var(--tg-color-scheme);
+  --bg-color: var(--tg-theme-secondary-bg-color, #ebedf0);
+  --block-bg-color: var(--tg-theme-bg-color);
+}
+
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+a {
+  color: var(--tg-theme-link-color);
+  text-decoration: none; 
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* Hint text styles */
+.hint-text {
+  color: var(--tg-theme-hint-color);
+}
+
+/* Button styles */
+button {
+  background-color: var(--tg-theme-button-color);
+  color: var(--tg-theme-button-text-color);
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.secondary-bg {
+  background-color: var(--tg-theme-secondary-bg-color);
+}
+
 
 a {
   font-weight: 500;

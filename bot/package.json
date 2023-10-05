@@ -16,8 +16,16 @@
     "test:coverage": "jest --coverage"
   },
   "dependencies": {
+    "@typegoose/typegoose": "^11.5.0",
+    "@types/got": "^9.6.12",
+    "bull": "^4.11.3",
+    "bullmq": "^4.12.0",
     "dotenv": "^16.3.1",
-    "grammy": "^1.19.0"
+    "fastify": "^4.23.2",
+    "got": "^13.0.0",
+    "grammy": "^1.19.0",
+    "mongoose": "^7.5.3",
+    "node-fetch": "^3.3.2"
   },
   "devDependencies": {
     "@types/jest": "^29.5.5",

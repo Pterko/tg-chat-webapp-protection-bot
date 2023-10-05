@@ -2,6 +2,7 @@
   "compilerOptions": {
     "module": "commonjs",
     "moduleResolution": "node",
+    "esModuleInterop": true,
     "pretty": true,
     "resolveJsonModule": true,
     "sourceMap": true,
@@ -9,7 +10,8 @@
     "outDir": "./dist",
     "baseUrl": "./src",
     "experimentalDecorators": true,
-    "strict": true
+    "strict": true,
+    "emitDecoratorMetadata": true,
   },
   "include": ["src/**/*.ts"],
   "exclude": ["node_modules", "src/**/*.spec.ts"]
