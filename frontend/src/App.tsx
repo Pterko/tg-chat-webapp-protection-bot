@@ -25,18 +25,19 @@ const ChatRules = ({ chatData }) => (
   <div className="flex items-center justify-center">
     <div className="p-8 w-full mx-4">
       <div className="text-center mb-6">
-        <span className="text-xl font-bold">Welcome to the chat</span>
-        <div className="text-4xl mt-2">{chatData.chatTitle}</div>
+        <span className="text-xl font-bold mb-2">Welcome to the chat</span>
+        <div className="text-4xl mt-2 mb-4">{chatData.chatTitle}</div>
       </div>
-      {chatData.rules ?       
+      {chatData.rules ? (
         <div className="text-center">
-          <span>Please, accept these rules before entering the chat:</span>
+          <span className="mb-4 text-lg">Please, accept these rules before entering the chat:</span>
           <ul className="mt-4 list-decimal list-inside">
-            {chatData.rules.map((x: String) => <li className="mt-2">{x}</li>)}
+            {chatData.rules.map((x, index) => (
+              <li key={index} className="mt-2 text-lg">{x}</li>
+            ))}
           </ul>
-        </div> 
-      : ""}
-
+        </div>
+      ) : null}
     </div>
   </div>
 );
@@ -54,8 +55,8 @@ function App() {
     const mainButtonHandler = () => {
       console.log('ONCLICK RECEIVED')
       window.Telegram.WebApp.MainButton.showProgress(true);
-      // captchaRef.current.execute();
-      onVerify("test");
+      captchaRef.current.execute();
+      // onVerify("test");
     }
 
     window.Telegram.WebApp.expand();
@@ -120,6 +121,11 @@ function App() {
 
       if (data.success) {
         setShowSuccess(true);
+        window.Telegram.WebApp.MainButton.text = "Return to chat";
+        window.Telegram.WebApp.MainButton.color = "#21C004";
+        window.Telegram.WebApp.MainButton.onClick(() => {
+          window.Telegram.WebApp.close();
+        })
       } else {
         console.error("Backend verification failed:", data.error);
       }

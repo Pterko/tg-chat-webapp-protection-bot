@@ -46,35 +46,37 @@ fastify.get<{Params: { userObjId: string }}>('/api/verifications/:userObjId/getC
 fastify.post<{ Params: { userObjId: string }, Body: { recaptchaToken: string } }>('/api/verifications/:userObjId/challenge', async (request, reply) => {
   const { recaptchaToken } = request.body;
   
-  // const verificationURL = `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.RECAPTCHA_SECRET}&response=${recaptchaToken}`;
+  const verificationURL = `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.RECAPTCHA_SECRET}&response=${recaptchaToken}`;
   
-  // const recaptchaResponse = await fetch(verificationURL, {
-  //   method: 'POST',
-  // });
-  // const recaptchaData: any = await recaptchaResponse.json();
+  const recaptchaResponse = await fetch(verificationURL, {
+    method: 'POST',
+  });
+  const recaptchaData: any = await recaptchaResponse.json();
 
-  // console.log('recaptchaData', recaptchaData)
+  console.log('recaptchaData', recaptchaData)
 
-  // if (!recaptchaData.success) {
-  //   return reply.send({ success: false, error: 'RECAPTCHA_VALIDATION_FAILED' });
-  // }
+  if (!recaptchaData.success) {
+    return reply.send({ success: false, error: 'RECAPTCHA_VALIDATION_FAILED' });
+  }
 
   const userObj = await UserModel.findById(request.params.userObjId);
   if (!userObj) {
     return reply.send({ success: false, error: 'USERNOTFOUND' });
   }
+  
+  if (!userObj.verified){
+    userObj.verified = true;
+    await userObj.save();
 
-  userObj.verified = true;
-  await userObj.save();
+    verificationSuccessQueue.add('verificationSuccess', { userObj });
+  }
 
   reply.send({
     success: true,
     data: userObj
   });
 
-  verificationSuccessQueue.add('verificationSuccess', { userObj });
-
-  console.log('Verification success')
+  console.log(`Success verification for user ${userObj.userId}`);
 });
 
 

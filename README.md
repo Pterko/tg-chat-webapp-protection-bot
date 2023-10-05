@@ -4,5 +4,4 @@ This bot is implemented to protect Telegram chats using WebApp (MiniApps) Telegr
 
 ## Backend
 
-
 ## Frontend
