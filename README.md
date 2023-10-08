@@ -1,6 +1,6 @@
 # Telegram Chat Webapp Protection Bot
 
-Protect your Telegram chats using the WebApp (MiniApps) Telegram technology enhanced with the power of Recaptcha. This bot supports integration with various captcha providers as per the need.
+Secure your Telegram chats using the WebApp (MiniApps) Telegram technology, powered by Recaptcha.
 
 ## Table of Contents
 
@@ -9,64 +9,87 @@ Protect your Telegram chats using the WebApp (MiniApps) Telegram technology enha
   - [Features](#features)
   - [Components](#components)
     - [Frontend](#frontend)
-      - [Env Variables](#env-variables)
+      - [Environment Variables](#environment-variables)
       - [Development](#development)
       - [Production](#production)
     - [Backend](#backend)
+      - [Environment Variables](#environment-variables-1)
   - [Getting Started](#getting-started)
     - [Frontend Setup](#frontend-setup)
     - [Backend Setup](#backend-setup)
+  - [Contribution](#contribution)
 
 ## Features
 
-- **Chat Protection**: Ensure that only genuine users can join your Telegram chat.
-- **Allow you to customize chat rules**: Allow you to customize chat rules
+- **Chat Protection**: Ensure only genuine users access your Telegram chat.
+- **Customizable Chat Rules**: Modify chat rules to fit your community's needs.
+
 ## Components
 
-This bot is structured into two core components:
-1. Backend: Manages the bot operations.
-2. Frontend: A web application interface for Telegram, displaying chat rules and facilitating recaptcha verification.
+The bot is structured into two main components:
+1. **Frontend**: Provides a user interface on Telegram, showcasing chat rules and handling recaptcha verifications.
+2. **Backend**: Oversees bot operations and functionalities.
 
 ### Frontend
 
-#### Env Variables
+#### Environment Variables
 
-Before running the frontend in either development or production mode, ensure you've set the environment variables. The frontend primarily requires the `VITE_RECAPTCHA_PUBLIC` variable, corresponding to the Recaptcha public key. Obtain this key [here](https://www.google.com/recaptcha/admin).
+Before initializing the frontend, set the required environment variables. The key variable is `VITE_RECAPTCHA_PUBLIC`, corresponding to the Recaptcha public key. Obtain it [here](https://www.google.com/recaptcha/admin).
 
 #### Development
 
-To initiate the frontend in development mode:
-1. Run `npm run dev`. This command activates the frontend on your localhost.
-2. To make the frontend externally accessible, utilize tools such as `ngrok`, `localtunnel`, or `cloudflared`.
-   
-For simplification, use `cloudflared`. Follow the installation instructions [here](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/downloads/). We've also included a handy script to run cloudflared. Execute `npm run proxy` and you should receive an external link to your frontend.
+To run the frontend in development:
+1. Start the frontend on localhost: `npm run dev`.
+2. Make it externally accessible using `ngrok`, `localtunnel`, or `cloudflared`.
 
-> **Pro Tip**: For a persistent link, consider setting up a permanent cloudflared tunnel.
+For convenience, utilize `cloudflared`. Follow the [installation guide](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/downloads/) and run `npm run proxy` for an external access link.
+
+> **Pro Tip**: Set up a permanent cloudflared tunnel for a consistent access link.
 
 #### Production
 
-To deploy in production:
-
-1. Execute `npm run build` to construct the frontend application files.
-2. Navigate to Cloudflare Pages and upload the generated files for deployment. 
-3. Optionally, link your GitHub repo to Cloudflare pages for automated CI/CD.
+To deploy to production:
+1. Build the frontend: `npm run build`.
+2. Upload and deploy the built files on Cloudflare Pages.
+3. Optionally, link your GitHub repository to Cloudflare Pages for continuous integration.
 
 ### Backend
 
-*Coming Soon...*
+#### Environment Variables
+
+Initialize the backend by setting the following variables:
+
+```
+BOT_TOKEN=
+WEB_APP_URL=
+WEB_APP_TG_URI=
+MONGO_URI=
+RECAPTCHA_SECRET=
+REDIS_USERNAME=
+REDIS_PASSWORD=
+REDIS_HOST=
+REDIS_PORT=
+```
+
+For running the backend:
+- Development mode: `npm run dev`.
+- Containerization: Use the provided Dockerfile.
+- Production: `npm run build && npm run start`.
+
+*Additional details forthcoming.*
 
 ## Getting Started
 
 ### Frontend Setup
 
-1. Set the environment variable: `VITE_RECAPTCHA_PUBLIC`
-2. For development, follow the instructions under [Development](#development).
-3. For production, see the instructions under [Production](#production).
+1. Set the `VITE_RECAPTCHA_PUBLIC` environment variable.
+2. For development, see [Frontend Development](#development).
+3. For production, refer to [Frontend Production](#production).
 
 ### Backend Setup
 
-*Information to be added...*
+Follow the [Backend Environment Variables](#backend) instructions and select your deployment method.
 
----
+## Contribution
 
-Feel free to contribute and enhance this bot's functionality. Pull requests and suggestions are welcome!
+Enhance this bot with your contributions! Pull requests, suggestions, and feedback are heartily welcomed. Let's work together to amplify its capabilities!
