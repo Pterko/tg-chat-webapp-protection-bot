@@ -6,6 +6,7 @@ Secure your Telegram chats using the WebApp (MiniApps) Telegram technology, powe
 
 - [Telegram Chat Webapp Protection Bot](#telegram-chat-webapp-protection-bot)
   - [Table of Contents](#table-of-contents)
+  - [How to use bot](#how-to-use-bot)
   - [Features](#features)
   - [Components](#components)
     - [Frontend](#frontend)
@@ -18,6 +19,15 @@ Secure your Telegram chats using the WebApp (MiniApps) Telegram technology, powe
     - [Frontend Setup](#frontend-setup)
     - [Backend Setup](#backend-setup)
   - [Contribution](#contribution)
+
+## How to use bot
+To use this bot as a user, you may consider to use our hosted version of bot: @tg_chat_webapp_protection_bot
+How to use it:
+1. Add this bot to your chat
+2. Grant administrator permissions to the bot
+3. Send `/enableProtection` command from user to the chat to enable protection for this chat.
+4. Optionally: set rules of your chat using `/setRules` command. Each rule shoud start with a newline.
+
 
 ## Features
 
