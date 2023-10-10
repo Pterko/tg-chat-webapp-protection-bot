@@ -16,6 +16,7 @@
     "test:coverage": "jest --coverage"
   },
   "dependencies": {
+    "@fastify/cors": "^8.4.0",
     "@typegoose/typegoose": "^11.5.0",
     "@types/got": "^9.6.12",
     "bull": "^4.11.3",

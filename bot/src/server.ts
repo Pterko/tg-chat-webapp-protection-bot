@@ -1,4 +1,5 @@
-import Fastify from 'fastify'
+import Fastify from 'fastify';
+import cors from '@fastify/cors'
 import { verificationSuccessQueue } from './queues';
 import UserModel from './models/user';
 import ChatModel from './models/chat';
@@ -8,6 +9,9 @@ const fastify = Fastify({
   logger: true
 })
 
+fastify.register(cors, {
+  origin: '*'
+})
 
 fastify.post<{Params: { userObjId: string}, Body:{ initData: string }}>('/api/verifications/:userObjId/getChat', async (request, reply) => {
   const validationResult = validateDataFromMiniApp(request.body.initData);
