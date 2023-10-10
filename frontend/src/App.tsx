@@ -8,7 +8,7 @@ import { api } from './api';
 
 const Reaptcha = memo(NoMemoReaptcha);
 const SITE_KEY = import.meta.env.VITE_RECAPTCHA_PUBLIC;
-
+console.log('SITE_KEY', SITE_KEY)
 const CheckIcon = () => (
   <svg
     className="w-full h-full text-green-500 mx-auto"
