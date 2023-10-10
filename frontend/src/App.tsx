@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import './index.css'
 import Reaptcha from 'reaptcha';
 import { CSSTransition } from 'react-transition-group';
@@ -146,7 +146,7 @@ function App() {
         classNames="fade"
         unmountOnExit
       >
-        {state => (fatalError || (!isShowSuccess && chatData) ? <ChatRules chatData={chatData} /> : null)}
+        {() => (fatalError || (!isShowSuccess && chatData) ? <ChatRules chatData={chatData} /> : null)}
       </CSSTransition>
       <Reaptcha
         ref={captchaRef}
@@ -160,7 +160,7 @@ function App() {
         classNames="fade"
         unmountOnExit
       >
-        {state => (isShowSuccess ? <SuccessPage /> : null)}
+        {() => (isShowSuccess ? <SuccessPage /> : null)}
       </CSSTransition>
     </div>
   )
