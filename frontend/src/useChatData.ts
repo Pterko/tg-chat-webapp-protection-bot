@@ -1,6 +1,19 @@
 import { useEffect, useState } from 'react';
+import { api } from './api';
 
 let isInited = false;
+
+export type Chat = {
+  chatId: number;
+  chatTitle?: string;
+  protectionEnabled?: boolean;
+  rules?: string[];
+};
+export type Response = {
+  success: boolean;
+  error?: string;
+  data: Chat;
+};
 
 export function useChatData({
   verificationId,
@@ -9,7 +22,7 @@ export function useChatData({
   verificationId: string;
   initData: string;
 }) {
-  const [chatData, setChatData] = useState(null);
+  const [chatData, setChatData] = useState<Chat>(null);
   const [fatalError, setFatalError] = useState('');
 
   useEffect(() => {
@@ -26,15 +39,10 @@ export function useChatData({
 
     async function loadData() {
       try {
-        const response = await fetch(
-          `/api/verifications/${verificationId}/getChat`,
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ initData }),
-          },
-        );
-        const data = await response.json();
+        const data = await api<Response>('/getChat', {
+          verificationId,
+          body: { initData },
+        });
 
         if (data.success) {
           setChatData(data.data);

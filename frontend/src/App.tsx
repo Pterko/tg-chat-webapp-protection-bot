@@ -4,6 +4,7 @@ import Reaptcha from 'reaptcha';
 import { CSSTransition } from 'react-transition-group';
 import { useAppStartup } from './useAppStartup';
 import { useChatData } from './useChatData';
+import { api } from './api';
 
 const CheckIcon = () => (
   <svg
@@ -64,6 +65,7 @@ function App() {
   const captchaRef = useRef(null);
   const params = new URLSearchParams(window.Telegram.WebApp.initData);
   const verificationId = params.get('start_param');
+  const initData = window.Telegram.WebApp.initData;
 
   useAppStartup({ captchaRef });
   const { chatData, fatalError } = useChatData({
@@ -80,16 +82,10 @@ function App() {
     }
 
     try {
-      const response = await fetch(
-        `/api/verifications/${verificationId}/challenge`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ recaptchaToken: value }),
-        },
+      const data = await api<{ success?: boolean; error?: string }>(
+        '/challenge',
+        { verificationId, body: { recaptchaToken: value, initData } },
       );
-
-      const data = await response.json();
 
       if (data.success) {
         setShowSuccess(true);
@@ -109,13 +105,13 @@ function App() {
   return (
     <div className="flex items-center justify-center">
       <CSSTransition
-        in={!fatalError && !isShowSuccess && chatData}
+        in={!fatalError && !isShowSuccess && !!chatData}
         timeout={500}
         classNames="fade"
         unmountOnExit
       >
         {() =>
-          fatalError || (!isShowSuccess && chatData) ? (
+          fatalError || (!isShowSuccess && !!chatData) ? (
             <ChatRules chatData={chatData} />
           ) : null
         }
