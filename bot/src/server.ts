@@ -88,7 +88,7 @@ fastify.post<{ Params: { userObjId: string }, Body: { recaptchaToken: string, in
 
 function start() {
   // Run the server!
-  fastify.listen({ port: 12000 }, (err, address) => {
+  fastify.listen({ port: 12000, host: '0.0.0.0' }, (err, address) => {
     if (err) throw err
     // Server is now listening on ${address}
   })
