@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, memo } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import './index.css';
 import Reaptcha from 'reaptcha';
 import { CSSTransition } from 'react-transition-group';
