@@ -12,6 +12,7 @@ import { verificationTimeoutQueue } from './queues';
 import webServer from "./server";
 import redisConfig from './redisConfig';
 import { Worker } from 'bullmq';
+import isUserVerified from './utils/isUserVerified';
 
 
 connectDb();
@@ -25,6 +26,27 @@ bot.use((ctx, next) => {
 });
 
 bot.command("start", (ctx) => ctx.reply("Welcome! Up and running."));
+
+bot.on("message:text", async (ctx) => {
+  if (ctx.chat && ["group", "supergroup"].includes(ctx.chat.type)) {
+    const userId = ctx.from?.id;
+    const chatId = ctx.chat.id;
+
+    if (userId) {
+      const verified = await isUserVerified(userId, chatId);
+      const admin = await isAdmin(ctx);
+
+      if (!verified && !admin) {
+        // If the user is neither verified nor an admin, delete their message
+        if (ctx.message?.message_id) {
+          await bot.api.deleteMessage(ctx.chat.id, ctx.message.message_id);
+        }
+        return; // Stop further processing
+      }
+    }
+  }
+});
+
 
 const processNewMembers = async (ctx: Context) => { 
   const newMembers = ctx.update.message?.new_chat_members || [];
@@ -132,6 +154,9 @@ const verificationSuccessWorker = new Worker('verificationSuccessQueue', async j
   console.log('worker received data', job.data);
   const userObj: User = job.data.userObj;
   console.log(`Successful verification for user ${userObj.userId}`);
+  if (userObj && userObj.welcomeMessageId){
+    await bot.api.deleteMessage(userObj.chatId, userObj.welcomeMessageId);
+  }
   return true;
 }, { connection: redisConfig });
 

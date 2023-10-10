@@ -76,7 +76,7 @@ fastify.post<{ Params: { userObjId: string }, Body: { recaptchaToken: string, in
     userObj.verified = true;
     await userObj.save();
 
-    verificationSuccessQueue.add('verificationSuccess', { userObj });
+    verificationSuccessQueue.add('verificationSuccessQueue', { userObj });
   }
 
   reply.send({
