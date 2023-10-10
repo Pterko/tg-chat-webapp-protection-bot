@@ -1,7 +1,9 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef } from 'react';
 import './index.css';
 import Reaptcha from 'reaptcha';
 import { CSSTransition } from 'react-transition-group';
+import { useAppStartup } from './useAppStartup';
+import { useChatData } from './useChatData';
 
 const CheckIcon = () => (
   <svg
@@ -58,71 +60,16 @@ const ChatRules = ({ chatData }) => (
 );
 
 function App() {
-  const [fatalError, setFatalError] = useState('');
   const [isShowSuccess, setShowSuccess] = useState(false);
-  const [chatData, setChatData] = useState(null);
   const captchaRef = useRef(null);
   const params = new URLSearchParams(window.Telegram.WebApp.initData);
-  const startParam = params.get('start_param');
+  const verificationId = params.get('start_param');
 
-  useEffect(() => {
-    const mainButtonHandler = () => {
-      console.log('ONCLICK RECEIVED');
-      window.Telegram.WebApp.MainButton.showProgress(true);
-      captchaRef.current.execute();
-      // onVerify("test");
-    };
-
-    window.Telegram.WebApp.expand();
-    window.Telegram.WebApp.MainButton.text = 'Enter Chat';
-
-    window.Telegram.WebApp.MainButton;
-    window.Telegram.WebApp.MainButton.onClick(mainButtonHandler);
-    console.log('Set onclick handler !!!!!!!!!!!!!!!!');
-    window.Telegram.WebApp.MainButton.show();
-    return () => {
-      console.log('CLEANUP RUN');
-      window.Telegram.WebApp.MainButton.offClick(mainButtonHandler);
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!startParam) {
-      console.error('start_param (userObjId) not found in initData.');
-      setFatalError('Incorrect start parameter');
-      return;
-    }
-
-    async function loadData() {
-      try {
-        const response = await fetch(
-          `/api/verifications/${startParam}/getChat`,
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ initData: window.Telegram.WebApp.initData }),
-          },
-        );
-        const data = await response.json();
-
-        if (data.success) {
-          setChatData(data.data);
-        } else {
-          if (data.error === 'INVALID_USER') {
-            return setFatalError(
-              'Sorry, this verification request is meant to be verified by another user. Please close this window.',
-            );
-          }
-          setFatalError(`Error while getting chat data: ${data.error}`);
-        }
-      } catch (error) {
-        setFatalError('Error while fetching data');
-        console.error('Error while fetching chat data:', error);
-      }
-    }
-
-    loadData();
-  }, [startParam]);
+  useAppStartup({ captchaRef });
+  const { chatData, fatalError } = useChatData({
+    verificationId,
+    initData: window.Telegram.WebApp.initData,
+  });
 
   async function onVerify(value) {
     window.Telegram.WebApp.MainButton.hideProgress();
@@ -134,7 +81,7 @@ function App() {
 
     try {
       const response = await fetch(
-        `/api/verifications/${startParam}/challenge`,
+        `/api/verifications/${verificationId}/challenge`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
