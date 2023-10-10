@@ -1,12 +1,22 @@
-import { useState, useEffect, useRef } from 'react'
-import './index.css'
+import { useState, useEffect, useRef } from 'react';
+import './index.css';
 import Reaptcha from 'reaptcha';
 import { CSSTransition } from 'react-transition-group';
 
-
 const CheckIcon = () => (
-  <svg className="w-full h-full text-green-500 mx-auto" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M3 12L9 18L22 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+  <svg
+    className="w-full h-full text-green-500 mx-auto"
+    viewBox="0 0 24 24"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      d="M3 12L9 18L22 5"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
   </svg>
 );
 
@@ -17,7 +27,10 @@ const SuccessPage = () => (
       <div className="absolute inset-0 bg-green-200 opacity-10 rounded-full"></div>
     </div>
     <h2 className="text-2xl font-bold mb-2">Success!</h2>
-    <p className="">You're successfully completed verification process. You can close this window.</p>
+    <p className="">
+      You're successfully completed verification process. You can close this
+      window.
+    </p>
   </div>
 );
 
@@ -29,10 +42,14 @@ const ChatRules = ({ chatData }) => (
     </div>
     {chatData.rules ? (
       <div className="text-center">
-        <span className="mb-4 text-lg">Please, accept these rules before entering the chat:</span>
+        <span className="mb-4 text-lg">
+          Please, accept these rules before entering the chat:
+        </span>
         <ul className="mt-4 list-decimal list-inside">
           {chatData.rules.map((x, index) => (
-            <li key={index} className="mt-2 text-lg">{x}</li>
+            <li key={index} className="mt-2 text-lg">
+              {x}
+            </li>
           ))}
         </ul>
       </div>
@@ -41,7 +58,7 @@ const ChatRules = ({ chatData }) => (
 );
 
 function App() {
-  const [fatalError, setFatalError] = useState("");
+  const [fatalError, setFatalError] = useState('');
   const [isShowSuccess, setShowSuccess] = useState(false);
   const [chatData, setChatData] = useState(null);
   const captchaRef = useRef(null);
@@ -50,56 +67,57 @@ function App() {
 
   useEffect(() => {
     const mainButtonHandler = () => {
-      console.log('ONCLICK RECEIVED')
+      console.log('ONCLICK RECEIVED');
       window.Telegram.WebApp.MainButton.showProgress(true);
       captchaRef.current.execute();
       // onVerify("test");
-    }
+    };
 
     window.Telegram.WebApp.expand();
-    window.Telegram.WebApp.MainButton.text = "Enter Chat";
+    window.Telegram.WebApp.MainButton.text = 'Enter Chat';
 
-    window.Telegram.WebApp.MainButton
+    window.Telegram.WebApp.MainButton;
     window.Telegram.WebApp.MainButton.onClick(mainButtonHandler);
-    console.log('Set onclick handler !!!!!!!!!!!!!!!!')
+    console.log('Set onclick handler !!!!!!!!!!!!!!!!');
     window.Telegram.WebApp.MainButton.show();
     return () => {
-      console.log('CLEANUP RUN')
+      console.log('CLEANUP RUN');
       window.Telegram.WebApp.MainButton.offClick(mainButtonHandler);
-    }
-  }, [])
-
-
-
-
+    };
+  }, []);
 
   useEffect(() => {
     if (!startParam) {
-      console.error("start_param (userObjId) not found in initData.");
-      setFatalError("Incorrect start parameter");
+      console.error('start_param (userObjId) not found in initData.');
+      setFatalError('Incorrect start parameter');
       return;
     }
 
     async function loadData() {
       try {
-        const response = await fetch(`/api/verifications/${startParam}/getChat`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ initData: window.Telegram.WebApp.initData })
-        });
+        const response = await fetch(
+          `/api/verifications/${startParam}/getChat`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ initData: window.Telegram.WebApp.initData }),
+          },
+        );
         const data = await response.json();
 
         if (data.success) {
           setChatData(data.data);
         } else {
-          if (data.error === "INVALID_USER") {
-            return setFatalError("Sorry, this verification request is meant to be verified by another user. Please close this window.")
+          if (data.error === 'INVALID_USER') {
+            return setFatalError(
+              'Sorry, this verification request is meant to be verified by another user. Please close this window.',
+            );
           }
           setFatalError(`Error while getting chat data: ${data.error}`);
         }
       } catch (error) {
-        setFatalError("Error while fetching data");
-        console.error("Error while fetching chat data:", error);
+        setFatalError('Error while fetching data');
+        console.error('Error while fetching chat data:', error);
       }
     }
 
@@ -110,31 +128,34 @@ function App() {
     window.Telegram.WebApp.MainButton.hideProgress();
 
     if (!value) {
-      console.error("Captcha token is null or undefined.");
+      console.error('Captcha token is null or undefined.');
       return;
     }
 
     try {
-      const response = await fetch(`/api/verifications/${startParam}/challenge`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ recaptchaToken: value })
-      });
+      const response = await fetch(
+        `/api/verifications/${startParam}/challenge`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ recaptchaToken: value }),
+        },
+      );
 
       const data = await response.json();
 
       if (data.success) {
         setShowSuccess(true);
-        window.Telegram.WebApp.MainButton.text = "Return to chat";
-        window.Telegram.WebApp.MainButton.color = "#21C004";
+        window.Telegram.WebApp.MainButton.text = 'Return to chat';
+        window.Telegram.WebApp.MainButton.color = '#21C004';
         window.Telegram.WebApp.MainButton.onClick(() => {
           window.Telegram.WebApp.close();
-        })
+        });
       } else {
-        console.error("Backend verification failed:", data.error);
+        console.error('Backend verification failed:', data.error);
       }
     } catch (error) {
-      console.error("Error verifying captcha with backend:", error);
+      console.error('Error verifying captcha with backend:', error);
     }
   }
 
@@ -146,7 +167,11 @@ function App() {
         classNames="fade"
         unmountOnExit
       >
-        {() => (fatalError || (!isShowSuccess && chatData) ? <ChatRules chatData={chatData} /> : null)}
+        {() =>
+          fatalError || (!isShowSuccess && chatData) ? (
+            <ChatRules chatData={chatData} />
+          ) : null
+        }
       </CSSTransition>
       <Reaptcha
         ref={captchaRef}
@@ -163,7 +188,7 @@ function App() {
         {() => (isShowSuccess ? <SuccessPage /> : null)}
       </CSSTransition>
     </div>
-  )
+  );
 }
 
 export default App;

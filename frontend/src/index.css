@@ -23,9 +23,8 @@
   -webkit-text-size-adjust: 100%;
 }
 
-
 body {
-  font-family: 'Arial', sans-serif; 
+  font-family: 'Arial', sans-serif;
   background-color: var(--block-bg-color);
   color: var(--tg-theme-text-color);
   color-scheme: var(--tg-color-scheme);
@@ -42,9 +41,8 @@ body {
 
 a {
   color: var(--tg-theme-link-color);
-  text-decoration: none; 
+  text-decoration: none;
 }
-
 
 .fade-enter,
 .fade-exit-done {
@@ -56,7 +54,9 @@ a {
 .fade-exit {
   opacity: 1;
   transform: scale(1);
-  transition: opacity 300ms, transform 300ms;
+  transition:
+    opacity 300ms,
+    transform 300ms;
 }
 
 a:hover {
@@ -82,7 +82,6 @@ button {
 .secondary-bg {
   background-color: var(--tg-theme-secondary-bg-color);
 }
-
 
 a {
   font-weight: 500;
