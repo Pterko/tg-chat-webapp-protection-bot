@@ -23,8 +23,8 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v2
         with:
-          context: .
-          file: ./bot/Dockerfile
+          context: ./bot
+          file: ./Dockerfile
           push: true
           tags: ghcr.io/pterko/tg-chat-webapp-protection-bot:latest
 
