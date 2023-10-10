@@ -1,13 +1,14 @@
 import { useState, useRef, useCallback, memo } from 'react';
 import './index.css';
-import NoMemoReaptcha from 'reaptcha';
+import Reaptcha from 'reaptcha';
 import { CSSTransition } from 'react-transition-group';
 import { useAppStartup } from './useAppStartup';
 import { useChatData } from './useChatData';
 import { api } from './api';
 
-const Reaptcha = memo(NoMemoReaptcha);
+
 const SITE_KEY = import.meta.env.VITE_RECAPTCHA_PUBLIC;
+
 console.log('SITE_KEY', SITE_KEY)
 const CheckIcon = () => (
   <svg
