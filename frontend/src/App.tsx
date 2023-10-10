@@ -70,9 +70,12 @@ function App() {
   const verificationId = params.get('start_param');
   const initData = window.Telegram.WebApp.initData;
 
-  const onVerify = useCallback(async (token: string) => {
+  const onRecaptchaReady = useCallback(() => {
     window.Telegram.WebApp.MainButton.hideProgress();
+    window.Telegram.WebApp.MainButton.enable();
+  }, []);
 
+  const onVerify = useCallback(async (token: string) => {
     if (!token) {
       console.error('Captcha token is null or undefined.');
       return;
@@ -86,6 +89,7 @@ function App() {
 
       if (data.success) {
         setShowSuccess(true);
+        window.Telegram.WebApp.MainButton.hideProgress();
         window.Telegram.WebApp.MainButton.text = 'Return to chat';
         window.Telegram.WebApp.MainButton.color = '#21C004';
         window.Telegram.WebApp.MainButton.onClick(() => {
@@ -119,7 +123,12 @@ function App() {
           ) : null
         }
       </CSSTransition>
-      <ReCAPTCHA ref={captchaRef} sitekey={SITE_KEY} size="invisible" />
+      <ReCAPTCHA
+        ref={captchaRef}
+        sitekey={SITE_KEY}
+        asyncScriptOnLoad={onRecaptchaReady}
+        size="invisible"
+      />
       <CSSTransition
         in={isShowSuccess}
         timeout={500}

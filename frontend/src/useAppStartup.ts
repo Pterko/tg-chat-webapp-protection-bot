@@ -19,6 +19,8 @@ export function useAppStartup({
     window.Telegram.WebApp.expand();
     window.Telegram.WebApp.MainButton.setText('Enter Chat');
     window.Telegram.WebApp.MainButton.onClick(mainButtonHandler);
+    window.Telegram.WebApp.MainButton.disable();
+    window.Telegram.WebApp.MainButton.showProgress(true);
     window.Telegram.WebApp.MainButton.show();
 
     return () => {
