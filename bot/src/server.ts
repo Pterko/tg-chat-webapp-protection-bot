@@ -9,9 +9,9 @@ const fastify = Fastify({
   logger: true
 })
 
-// fastify.register(cors, {
-//   origin: '*'
-// })
+fastify.register(cors, {
+  origin: '*'
+})
 
 fastify.post<{Params: { userObjId: string}, Body:{ initData: string }}>('/api/verifications/:userObjId/getChat', async (request, reply) => {
   console.log('1');
