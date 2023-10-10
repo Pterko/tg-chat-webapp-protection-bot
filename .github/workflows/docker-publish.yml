@@ -26,5 +26,5 @@ jobs:
           context: .
           file: ./bot/Dockerfile
           push: true
-          tags: ghcr.io/${{ github.repository }}-bot:latest
+          tags: ghcr.io/pterko/tg-chat-webapp-protection-bot:latest
 
