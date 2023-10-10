@@ -9,12 +9,14 @@ const fastify = Fastify({
   logger: true
 })
 
-fastify.register(cors, {
-  origin: '*'
-})
+// fastify.register(cors, {
+//   origin: '*'
+// })
 
 fastify.post<{Params: { userObjId: string}, Body:{ initData: string }}>('/api/verifications/:userObjId/getChat', async (request, reply) => {
+  console.log('1');
   const validationResult = validateDataFromMiniApp(request.body.initData);
+  console.log('postvalidate');
   if (!validationResult.isValid){
     return reply.send({success: false, error: 'MAILFORMED_HASH'});
   }
@@ -88,11 +90,16 @@ fastify.post<{ Params: { userObjId: string }, Body: { recaptchaToken: string, in
 
 function start() {
   // Run the server!
+  fastify.setErrorHandler((error) => {
+    console.log('Received error', error);
+  })
+
   fastify.listen({ port: 12000, host: '0.0.0.0' }, (err, address) => {
     if (err) throw err
     // Server is now listening on ${address}
   })
 }
+
 
 
 

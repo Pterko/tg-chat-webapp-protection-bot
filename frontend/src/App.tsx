@@ -1,15 +1,14 @@
 import { useState, useRef, useCallback } from 'react';
 import './index.css';
-import Reaptcha from 'reaptcha';
 import { CSSTransition } from 'react-transition-group';
 import { useAppStartup } from './useAppStartup';
 import { useChatData } from './useChatData';
 import { api } from './api';
-
+import ReCAPTCHA from 'react-google-recaptcha';
 
 const SITE_KEY = import.meta.env.VITE_RECAPTCHA_PUBLIC;
 
-console.log('SITE_KEY', SITE_KEY)
+console.log('SITE_KEY', SITE_KEY);
 const CheckIcon = () => (
   <svg
     className="w-full h-full text-green-500 mx-auto"
@@ -71,13 +70,7 @@ function App() {
   const verificationId = params.get('start_param');
   const initData = window.Telegram.WebApp.initData;
 
-  useAppStartup({ captchaRef });
-  const { chatData, fatalError } = useChatData({
-    verificationId,
-    initData: window.Telegram.WebApp.initData,
-  });
-
-  const onVerify = useCallback(async (token: string) => { {
+  const onVerify = useCallback(async (token: string) => {
     window.Telegram.WebApp.MainButton.hideProgress();
 
     if (!token) {
@@ -104,8 +97,13 @@ function App() {
     } catch (error) {
       console.error('Error verifying captcha with backend:', error);
     }
-  }
-}, [])
+  }, []);
+
+  useAppStartup({ captchaRef, onVerify });
+  const { chatData, fatalError } = useChatData({
+    verificationId,
+    initData,
+  });
 
   return (
     <div className="flex items-center justify-center">
@@ -121,12 +119,7 @@ function App() {
           ) : null
         }
       </CSSTransition>
-      <Reaptcha
-        ref={captchaRef}
-        sitekey={SITE_KEY}
-        size="invisible"
-        onVerify={onVerify}
-      />
+      <ReCAPTCHA ref={captchaRef} sitekey={SITE_KEY} size="invisible" />
       <CSSTransition
         in={isShowSuccess}
         timeout={500}

@@ -1,16 +1,19 @@
 import { MutableRefObject, useEffect } from 'react';
-import type Reaptcha from 'reaptcha';
+import type ReCaptcha from 'react-google-recaptcha';
 
 export function useAppStartup({
   captchaRef,
+  onVerify
 }: {
-  captchaRef: MutableRefObject<Reaptcha>;
+  captchaRef: MutableRefObject<ReCaptcha>;
+  onVerify: (token: string) => Promise<void>
 }) {
   useEffect(() => {
-    const mainButtonHandler = () => {
+    const mainButtonHandler = async () => {
       console.log('ONCLICK RECEIVED');
       window.Telegram.WebApp.MainButton.showProgress(true);
-      captchaRef.current.execute();
+      const token = await captchaRef.current.executeAsync();
+      await onVerify(token);
     };
 
     window.Telegram.WebApp.expand();
