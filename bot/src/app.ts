@@ -21,7 +21,7 @@ webServer();
 const bot = new Bot(String(process.env.BOT_TOKEN));
 
 bot.use((ctx, next) => {
-  console.log('Bot received event', ctx.update.message);
+  console.log('Bot received event', ctx.update);
   next();
 });
 
