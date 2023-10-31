@@ -14,7 +14,6 @@ import redisConfig from './redisConfig';
 import { Worker } from 'bullmq';
 import isUserVerified from './utils/isUserVerified';
 
-
 connectDb();
 webServer();
 
@@ -27,7 +26,7 @@ bot.use((ctx, next) => {
 
 bot.command("start", (ctx) => ctx.reply("Welcome! Up and running."));
 
-bot.on("message:text", async (ctx) => {
+bot.on("message:text", async (ctx, next) => {
   if (ctx.chat && ["group", "supergroup"].includes(ctx.chat.type)) {
     const userId = ctx.from?.id;
     const chatId = ctx.chat.id;
@@ -35,7 +34,6 @@ bot.on("message:text", async (ctx) => {
     if (userId) {
       const verified = await isUserVerified(userId, chatId);
       const admin = await isAdmin(ctx);
-
       if (!verified && !admin) {
         // If the user is neither verified nor an admin, delete their message
         if (ctx.message?.message_id) {
@@ -45,6 +43,7 @@ bot.on("message:text", async (ctx) => {
       }
     }
   }
+  next();
 });
 
 
@@ -112,8 +111,21 @@ const handleNewUser = async (ctx: Context, user: GrammyUser) => {
   }
 }
 
-bot.on(":new_chat_members", processNewMembers);
-bot.on("message:new_chat_members", processNewMembers);
+bot.on("chat_member", async (ctx) => {
+  const chatMemberUpdate = ctx.update.chat_member;
+  if (chatMemberUpdate) {
+    const newUser = chatMemberUpdate.new_chat_member;
+    const oldUser = chatMemberUpdate.old_chat_member;
+
+    // Check if the user is actually joining the chat
+    if (newUser.status === 'member' && oldUser.status !== 'member') {
+      await handleNewUser(ctx, newUser.user);
+    }
+  }
+});
+
+// bot.on(":new_chat_members", processNewMembers);
+// bot.on("message:new_chat_members", processNewMembers);
 
 async function isAdmin(ctx: Context): Promise<boolean> {
   const chatAdmins = await ctx.api.getChatAdministrators(Number(ctx.chat?.id));
@@ -148,6 +160,8 @@ bot.start({
 });
 
 
+
+
 const verificationSuccessWorker = new Worker('verificationSuccessQueue', async job => {
   // Will print { foo: 'bar'} for the first job
   // and { qux: 'baz' } for the second.
@@ -155,7 +169,7 @@ const verificationSuccessWorker = new Worker('verificationSuccessQueue', async j
   const userObj: User = job.data.userObj;
   console.log(`Successful verification for user ${userObj.userId}`);
   if (userObj && userObj.welcomeMessageId){
-    await bot.api.deleteMessage(userObj.chatId, userObj.welcomeMessageId);
+    await bot.api.deleteMessage(String(userObj.chatId), userObj.welcomeMessageId);
   }
   return true;
 }, { connection: redisConfig });
@@ -169,10 +183,10 @@ const verificatiomTimeoutWorker = new Worker('verificationTimeoutQueue', async j
   if (userRecord && !userRecord.verified) {
     // Code to remove the user from chat
     // ctx.banChatMember(ctx.from.id, )
-    const removeMessageResult = await bot.api.sendMessage(userRecord.chatId, `Sorry, [${userRecord.userTgObj?.first_name}](tg://user?id=${userRecord.userTgObj?.id}), you didn\'t met the deadline of verification. You can try to join this chat again when you\'ll be ready`, {parse_mode: 'MarkdownV2'});
-    const removeResult = await bot.api.banChatMember(userRecord.chatId, userRecord.userId);
+    const removeMessageResult = await bot.api.sendMessage(String(userRecord.chatId), `Sorry, [${userRecord.userTgObj?.first_name}](tg://user?id=${userRecord.userTgObj?.id}), you didn\'t met the deadline of verification. You can try to join this chat again when you\'ll be ready`, {parse_mode: 'MarkdownV2'});
+    const removeResult = await bot.api.banChatMember(String(userRecord.chatId), userRecord.userId);
     console.log('RemoveResult', removeResult);
-    await bot.api.deleteMessage(userRecord.chatId, removeMessageResult.message_id);
+    await bot.api.deleteMessage(String(userRecord.chatId), removeMessageResult.message_id);
   }
   if (userRecord?.welcomeMessageId) {
     await bot.api.deleteMessage(String(userRecord?.chatId), userRecord?.welcomeMessageId);
