@@ -14,6 +14,13 @@ import redisConfig from './redisConfig';
 import { Worker } from 'bullmq';
 import isUserVerified from './utils/isUserVerified';
 
+Object.defineProperty(BigInt.prototype, "toJSON", {
+  get() {
+      "use strict";
+      return () => String(this);
+  }
+});
+
 connectDb();
 webServer();
 

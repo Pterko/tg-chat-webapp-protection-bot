@@ -1,8 +1,8 @@
 import { prop, getModelForClass } from '@typegoose/typegoose';
-import mongoose from 'mongoose';
+import mongoose, { SchemaTypes } from 'mongoose';
 
 export class Chat {
-  @prop({ required: true, type: Number })
+  @prop({ required: true, type: SchemaTypes.BigInt })
   chatId!: number;
 
   @prop({type: String})
